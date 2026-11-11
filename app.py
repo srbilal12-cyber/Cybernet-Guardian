@@ -52,7 +52,7 @@ def get_gateway():
 
 def ping_host(ip):
     system = platform.system().lower()
-    cmd = ["ping", "-n", "1", "-w", "850", ip] if system == "windows" else ["ping", "-c", "1", "-W", "1", ip]
+    cmd = ["ping", "-n", "1", "-w", "850", ip] if system == "windows" else (["ping", "-c", "1", "-W", "1000", ip] if system == "darwin" else ["ping", "-c", "1", "-W", "1", ip])
     try:
         subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=1.8)
         return ip
@@ -119,7 +119,7 @@ def discover():
         devices.append({
             "ip": ip,
             "mac": macs.get(ip, "Not visible in ARP table"),
-            "method": "Ping response" if ip in responsive else "ARP",
+            "method": "Ping response" if ip in pinged else "ARP table",
             "note": "Device responded to local discovery; identity is not verified."
         })
     return jsonify({
